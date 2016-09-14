@@ -1,7 +1,7 @@
 import socket
 
 # in another terminal after running this type: curl 0.0.0.0:8000
-
+#curl 127.0.0.0.1:8000 -H "Host: www.google.ca" match header to what the server is connecting to. Host header is the only way it would know is the one we are requesting
 #allocate a new socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
@@ -18,12 +18,26 @@ print (address)
 #client is going to be curl, web browser or something like that
 outgoing = socket.socket()
 outgoing.connect(("www.google.ca", 80))
+outgoing.setblocking(0)#prevent indefinite waiting
+client.setblocking(0)
 while True:
-      part = client.recv(1024)
-      print("< " + part)
+      try:
+	part = client.recv(1024)
+      except socket.error, exception:
+      	     if exception.errno == 11:
+	     	part = None
+	     else:
+		raise
       if (part):
       	 outgoing.sendall(part)
-      part = outgoing.recv(1024)
-      print("> " + part)
+	 print("< " + str(part))
+      try:
+	part = outgoing.recv(1024)
+      except socket.error, exception:
+      	     if exception.errno == 11:
+	     	part = None
+	     else:
+		raise
       if (part):
-      	 client.sendall(part)
+	client.sendall(part)
+	print("> " + str(part))
