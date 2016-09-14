@@ -1,20 +1,15 @@
 import socket
 
+# in another terminal after running this type: curl 0.0.0.0:8000
+
 #allocate a new socket
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-#connect to google.ca
-client.connect(('www.google.ca',80))
-http = "GET / HTTP/1.0\r\n\r\n"
+#listen on port 8000
+server.bind(('0.0.0.0', 8000))#means to listen on all addresses
+server.listen(1)
 
-client.sendall(http)
-
-msg = ''
-while True:
-      part = client.recv(1024)
-      if part:
-      	 msg += part
-      else:
-	 break
-
-print(msg)
+print("Waiting for connections...")
+client,address = server.accept()
+print("Connected")
+print (address)
